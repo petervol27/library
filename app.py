@@ -42,9 +42,9 @@ def login():
     if row:
         session.permanent = True
         session["reader"] = dict(row)
-        return {"response": "success", "reader": session["reader"]}
+        return jsonify({"response": "success", "reader": session["reader"]})
     else:
-        return {"response": "failed", "reader": "no user exists"}
+        return jsonify({"response": "failed", "reader": "no user exists"})
 
 
 @app.route("/get_session/")
@@ -56,7 +56,7 @@ def get_session():
 @app.route("/logout/")
 def logout():
     session.pop("reader", None)
-    return {"response": "logged out"}
+    return jsonify({"response": "logged out"})
 
 
 @app.route("/books/", methods=["GET"])
@@ -68,7 +68,7 @@ def get_books():
     )
     rows = cursor.fetchall()
     books = [dict(row) for row in rows]
-    return books
+    return jsonify(books)
 
 
 @app.route("/books_rented/", methods=["GET", "POST"])
@@ -79,14 +79,14 @@ def get_rented():
         cursor.execute("SELECT * FROM rented")
         rows = cursor.fetchall()
         rented = [dict(row) for row in rows]
-        return rented
+        return jsonify(rented)
     elif request.method == "POST":
         user = request.json
         user_id = user["userId"]
         cursor.execute("SELECT * FROM rented WHERE readerId=?", (user_id,))
         rows = cursor.fetchall()
         rented = [dict(row) for row in rows]
-        return rented
+        return jsonify(rented)
 
 
 @app.route("/readers/", methods=["GET"])
@@ -96,7 +96,7 @@ def get_readers():
     cursor.execute("SELECT * FROM readers WHERE ID != 1")
     rows = cursor.fetchall()
     readers = [dict(row) for row in rows]
-    return readers
+    return jsonify(readers)
 
 
 @app.route("/rent_book/<int:id>/")
@@ -113,7 +113,9 @@ def rent_book(id):
     )
     row = cursor.fetchone()
     if row:
-        return {"response": "failed", "message": "You have already Rented this book"}
+        return jsonify(
+            {"response": "failed", "message": "You have already Rented this book"}
+        )
     cursor.execute(
         "SELECT COUNT(*) FROM rented WHERE readerId=?",
         (reader.get("id"),),
@@ -121,14 +123,16 @@ def rent_book(id):
     rent_limit = cursor.fetchone()[0] + 1
 
     if rent_limit > 3:
-        return {"response": "failed", "message": "You have already Rented Three Books"}
+        return jsonify(
+            {"response": "failed", "message": "You have already Rented Three Books"}
+        )
     cursor.execute(
         "INSERT INTO rented(bookId,readerId,rentDate,returnDate) VALUES (?,?,datetime('now','localtime'),datetime('now','+10 days','localtime'))",
         (book.get("id"), reader.get("id")),
     )
     conn.commit()
     conn.close()
-    return {"response": "success", "message": "Book Rented Succesfully"}
+    return jsonify({"response": "success", "message": "Book Rented Succesfully"})
 
 
 @app.route("/return_book/<int:id>/")
@@ -145,7 +149,7 @@ def return_book(id):
     )
     conn.commit()
     conn.close()
-    return {"response": "success", "message": "Book Returned Succesfully"}
+    return jsonify({"response": "success", "message": "Book Returned Succesfully"})
 
 
 if __name__ == "__main__":
