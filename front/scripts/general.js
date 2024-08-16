@@ -1,7 +1,16 @@
 const logout = async () => {
-  const response = await axios.get('http://127.0.0.1:9000/logout/', {
-    withCredentials: true,
-  });
+  const response = await axios.get(
+    'http://127.0.0.1:9000/logout/',
+    {
+      withCredentials: true,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    }
+  );
   if (response) {
     window.location.href = 'index.html';
   }
@@ -15,6 +24,7 @@ const getSession = async () => {
     {
       headers: {
         'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
     }
   );
@@ -49,6 +59,7 @@ const getBooks = async function () {
   const response = await axios.get('http://127.0.0.1:9000/books/', {
     headers: {
       'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
   });
   return response.data;
@@ -63,6 +74,7 @@ const checkRented = async () => {
     {
       headers: {
         'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
     }
   );
@@ -78,6 +90,7 @@ const returnBook = async (bookId) => {
     {
       headers: {
         'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
     }
   );
