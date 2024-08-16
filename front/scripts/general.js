@@ -7,9 +7,17 @@ const logout = async () => {
   }
 };
 const getSession = async () => {
-  const response = await axios.get('http://127.0.0.1:9000/get_session/', {
-    withCredentials: true,
-  });
+  const response = await axios.get(
+    'http://127.0.0.1:9000/get_session/',
+    {
+      withCredentials: true,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
   const user = response.data.reader;
   return user;
 };
@@ -38,14 +46,26 @@ const checkLogin = async () => {
 };
 
 const getBooks = async function () {
-  const response = await axios.get('http://127.0.0.1:9000/books/');
+  const response = await axios.get('http://127.0.0.1:9000/books/', {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
   return response.data;
 };
 const checkRented = async () => {
   const user = await getSession();
-  const response = await axios.post('http://127.0.0.1:9000/books_rented/', {
-    userId: user.id,
-  });
+  const response = await axios.post(
+    'http://127.0.0.1:9000/books_rented/',
+    {
+      userId: user.id,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
   return response.data;
 };
 
@@ -54,6 +74,11 @@ const returnBook = async (bookId) => {
     `http://127.0.0.1:9000/return_book/${bookId}`,
     {
       withCredentials: true,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
     }
   );
   alert(response.data.message);

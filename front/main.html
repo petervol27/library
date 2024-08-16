@@ -144,6 +144,11 @@
       `http://127.0.0.1:9000/rent_book/${bookId}`,
       {
         withCredentials: true,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
     );
     alert(response.data.message);

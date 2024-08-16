@@ -76,11 +76,19 @@
   document.getElementById('logoutBtn').addEventListener('click', logout);
   checkLogin();
   const getReaders = async () => {
-    const response = await axios.get('http://127.0.0.1:9000/readers/');
+    const response = await axios.get('http://127.0.0.1:9000/readers/', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     return response.data;
   };
   const getRented = async () => {
-    const response = await axios.get('http://127.0.0.1:9000/books_rented/');
+    const response = await axios.get('http://127.0.0.1:9000/books_rented/', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     return response.data;
   };
   const displayReaders = async () => {
