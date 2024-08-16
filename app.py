@@ -5,7 +5,6 @@ from datetime import timedelta, datetime
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
-app.secret_key = "secret_key"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
 
 
