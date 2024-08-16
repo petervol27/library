@@ -33,7 +33,7 @@ def create_tables():
 def login():
     conn = get_connection()
     cursor = conn.cursor()
-    user_data = request.json
+    user_data = request.get_json
     cursor.execute(
         "SELECT * FROM readers WHERE email=? AND password=?",
         (user_data["email"], user_data["password"]),
@@ -81,7 +81,7 @@ def get_rented():
         rented = [dict(row) for row in rows]
         return jsonify(rented)
     elif request.method == "POST":
-        user = request.json
+        user = request.get_json
         user_id = user["userId"]
         cursor.execute("SELECT * FROM rented WHERE readerId=?", (user_id,))
         rows = cursor.fetchall()
