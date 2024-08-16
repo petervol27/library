@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <title>Sign in</title>
+
+    <link
+      rel="canonical"
+      href="https://getbootstrap.com/docs/4.0/examples/sign-in/"
+    />
+
+    <!-- Bootstrap core CSS -->
+    <link
+      href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+
+    <!-- Custom styles for this template -->
+    <link
+      href="https://getbootstrap.com/docs/4.0/examples/sign-in/signin.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="text-center">
+    <form class="form-signin" method="POST">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        class="size-6"
+        style="width: 25px"
+      >
+        <path
+          d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.25a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.75c1.995 0 3.823.707 5.25 1.886V4.533ZM12.75 20.636A8.214 8.214 0 0 1 18 18.75c.966 0 1.89.166 2.75.47a.75.75 0 0 0 1-.708V4.262a.75.75 0 0 0-.5-.707A9.735 9.735 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533v16.103Z"
+        />
+      </svg>
+      <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+      <label for="email" class="sr-only">Email address</label>
+      <input
+        type="email"
+        id="email"
+        class="form-control"
+        placeholder="Email address"
+        name="email"
+        required
+        autofocus
+      />
+      <label for="password" class="sr-only">Password</label>
+      <input
+        type="password"
+        id="password"
+        class="form-control"
+        placeholder="Password"
+        name="password"
+        required
+      />
+      <button class="btn btn-lg btn-primary btn-block" onclick="signIn(event)">
+        Sign in
+      </button>
+      <p id="errortxt" class="text-danger"></p>
+      <p class="mt-5 mb-3 text-muted">&copy; Library Company 2017-2018</p>
+    </form>
+  </body>
+</html>
+<script>
+  const signIn = async function (event) {
+    event.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const userData = { email: email, password: password };
+    const response = await axios.post('http://127.0.0.1:9000/', userData, {
+      withCredentials: true,
+    });
+    login = response.data;
+    if (login.response == 'success') {
+      window.location.href = 'main.html';
+    } else {
+      document.getElementById('errortxt').innerHTML = 'Wrong Credentials';
+    }
+  };
+</script>
