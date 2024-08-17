@@ -48,7 +48,7 @@ def login():
     if row:
         session.permanent = True
         session["reader"] = dict(row)
-        return jsonify({"response": "success", "reader": session["reader"]})
+        return jsonify({"response": "success", "reader": dict(row)})
     else:
         return jsonify({"response": "failed", "reader": "no user exists"})
 

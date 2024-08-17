@@ -92,7 +92,7 @@
       }
     );
     login = response.data;
-    console.log(login);
+    console.log(login.reader);
     if (login.response == 'success') {
       window.location.href = './front/main.html';
     } else {
