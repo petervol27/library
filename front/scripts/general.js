@@ -12,7 +12,7 @@ const logout = async () => {
     }
   );
   if (response) {
-    window.location.href = 'index.html';
+    window.location.href = '../index.html';
   }
 };
 const getSession = async () => {
@@ -40,7 +40,7 @@ const checkLogin = async () => {
   if (user) {
     document.getElementById('user-info').textContent = `Hello, ${user['name']}`;
   } else {
-    window.location.href = 'index.html';
+    window.location.href = '../index.html';
   }
   if (user.id != 1) {
     const navItem = document.createElement('li');
