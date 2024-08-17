@@ -30,7 +30,7 @@ def create_tables():
     )
 
 
-@app.route("/", methods=["POST", "GET"])
+@app.route("/", methods=["POST"])
 def login():
     conn = get_connection()
     cursor = conn.cursor()
