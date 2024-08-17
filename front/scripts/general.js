@@ -1,6 +1,6 @@
 const logout = async () => {
   const response = await axios.get(
-    'http://127.0.0.1:9000/logout/',
+    'https://library-klmc.onrender.com/logout/',
     {
       withCredentials: true,
     },
@@ -17,7 +17,7 @@ const logout = async () => {
 };
 const getSession = async () => {
   const response = await axios.get(
-    'http://127.0.0.1:9000/get_session/',
+    'https://library-klmc.onrender.com/get_session/',
     {
       withCredentials: true,
     },
@@ -56,7 +56,7 @@ const checkLogin = async () => {
 };
 
 const getBooks = async function () {
-  const response = await axios.get('http://127.0.0.1:9000/books/', {
+  const response = await axios.get('https://library-klmc.onrender.com/books/', {
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
@@ -67,7 +67,7 @@ const getBooks = async function () {
 const checkRented = async () => {
   const user = await getSession();
   const response = await axios.post(
-    'http://127.0.0.1:9000/books_rented/',
+    'https://library-klmc.onrender.com/books_rented/',
     {
       userId: user.id,
     },
@@ -83,7 +83,7 @@ const checkRented = async () => {
 
 const returnBook = async (bookId) => {
   const response = await axios.get(
-    `http://127.0.0.1:9000/return_book/${bookId}`,
+    `https://library-klmc.onrender.com/return_book/${bookId}`,
     {
       withCredentials: true,
     },
