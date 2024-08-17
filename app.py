@@ -59,6 +59,15 @@ def get_session():
     return jsonify(reader=reader)
 
 
+@app.route("/test_redis")
+def test_redis():
+    try:
+        app.config["SESSION_REDIS"].ping()
+        return "Redis connection successful", 200
+    except Exception as e:
+        return str(e), 500
+
+
 @app.route("/logout/")
 def logout():
     session.pop("reader", None)
