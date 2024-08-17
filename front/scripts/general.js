@@ -23,6 +23,8 @@ const getSession = async () => {
     }
   );
   const user = response.data.reader;
+  console.log(response.data);
+  console.log(user);
   return user;
 };
 
