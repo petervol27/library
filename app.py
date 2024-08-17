@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 import sqlite3
 from datetime import timedelta, datetime
+import redis
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
