@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, session
+from flask_session import Session
 from flask_cors import CORS
 import sqlite3
 from datetime import timedelta, datetime
@@ -8,6 +9,9 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True)
 app.secret_key = "secret key"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
+app.config["SESSION_TYPE"] = "redis"
+app.config["SESSION_REDIS"] = redis.from_url("redis://red-cr0e93rv2p9s73a6jd50:6379")
+Session(app)
 
 
 def get_connection():
