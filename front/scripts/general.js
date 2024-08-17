@@ -22,6 +22,7 @@ const getSession = async () => {
       withCredentials: true,
     }
   );
+  console.log(response.data);
   const user = response.data.reader;
   return user;
 };
