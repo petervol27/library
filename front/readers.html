@@ -73,24 +73,30 @@
   </body>
 </html>
 <script>
-  document.getElementById('logoutBtn').addEventListener('click', logout);
-  checkLogin();
+  // document.getElementById('logoutBtn').addEventListener('click', logout);
+  // checkLogin();
   const getReaders = async () => {
-    const response = await axios.get('http://127.0.0.1:9000/readers/', {
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-    });
+    const response = await axios.get(
+      'https://library-klmc.onrender.com/readers/',
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      }
+    );
     return response.data;
   };
   const getRented = async () => {
-    const response = await axios.get('http://127.0.0.1:9000/books_rented/', {
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-    });
+    const response = await axios.get(
+      'https://library-klmc.onrender.com/books_rented/',
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      }
+    );
     return response.data;
   };
   const displayReaders = async () => {

@@ -141,7 +141,7 @@
   displayBooks();
   const rentBook = async (bookId) => {
     const response = await axios.get(
-      `http://127.0.0.1:9000/rent_book/${bookId}`,
+      `https://library-klmc.onrender.com/rent_book/${bookId}`,
       {
         withCredentials: true,
       },
