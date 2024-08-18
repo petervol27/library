@@ -12,6 +12,10 @@ app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
 app.config["SESSION_TYPE"] = "redis"
 app.config["SESSION_REDIS"] = redis.from_url("redis://red-cr0e93rv2p9s73a6jd50:6379")
 Session(app)
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SAMESITE="None",  # Required for cross-site requests
+)
 
 
 def get_connection():
