@@ -21,6 +21,7 @@ app.config.update(
 # app.config["SESSION_COOKIE_DOMAIN"] = ".https://library-klmc.onrender.com/"
 # dev_env = "http://127.0.0.1:9000"
 # prod_env = "https://library-klmc.onrender.com/"
+Session(app)
 
 
 def get_connection():
