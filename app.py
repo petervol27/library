@@ -71,17 +71,10 @@ def login():
 @app.route("/get_session/")
 def get_session():
     reader = session.get("reader")
-    print(reader)
-    return jsonify(reader=reader)
-
-
-@app.route("/test_redis")
-def test_redis():
-    try:
-        app.config["SESSION_REDIS"].ping()
-        return "Redis connection successful", 200
-    except Exception as e:
-        return str(e), 500
+    if reader:
+        return jsonify(reader=reader)
+    else:
+        return jsonify({"response": "no session set"})
 
 
 @app.route("/logout/")
