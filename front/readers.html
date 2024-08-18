@@ -73,8 +73,8 @@
   </body>
 </html>
 <script>
-  // document.getElementById('logoutBtn').addEventListener('click', logout);
-  // checkLogin();
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+  checkLogin();
   const getReaders = async () => {
     const response = await axios.get(
       'https://library-klmc.onrender.com/readers/',
