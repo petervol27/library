@@ -84,6 +84,18 @@ def get_session():
         return jsonify({"response": "no session set"})
 
 
+@app.route("/set_test_session")
+def set_test_session():
+    session["test"] = "This is a test session"
+    return jsonify({"response": "Session set"})
+
+
+@app.route("/get_test_session")
+def get_test_session():
+    test_value = session.get("test", "No session found")
+    return jsonify({"session_value": test_value})
+
+
 @app.route("/logout/")
 def logout():
     session.pop("reader", None)

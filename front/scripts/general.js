@@ -20,6 +20,12 @@ const getSession = async () => {
     'https://library-klmc.onrender.com/get_session/',
     {
       withCredentials: true,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
     }
   );
   const user = response.data.reader;
