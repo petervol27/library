@@ -18,7 +18,7 @@ app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_SAMESITE="None",  # Required for cross-site requests
 )
-app.config["SESSION_COOKIE_DOMAIN"] = ".https://library-klmc.onrender.com/"
+# app.config["SESSION_COOKIE_DOMAIN"] = ".https://library-klmc.onrender.com/"
 
 
 def get_connection():
