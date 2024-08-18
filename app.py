@@ -95,7 +95,7 @@ def get_session():
         return jsonify({"response": "no session set"})
 
 
-@app.route("/set_test_session")
+@app.route("/set_test_session", methods=["POST", "GET"])
 def set_test_session():
     conn = get_connection()
     cursor = conn.cursor()
