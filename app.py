@@ -8,7 +8,7 @@ from datetime import timedelta, datetime
 # import redis
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=["https://petervol27.github.io"])
 app.secret_key = "secret key"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
 # app.config["SESSION_TYPE"] = "redis"
@@ -16,10 +16,13 @@ app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
 # app.config["SESSION_REDIS"] = redis.from_url("redis://red-cr0e93rv2p9s73a6jd50:6379")
 # app.config["SESSION_REDIS"] = redis.from_url("redis://localhost:6379/0")
 # Session(app)
-app.config.update(
-    SESSION_COOKIE_SECURE=True,
-    SESSION_COOKIE_SAMESITE="Lax",
-)
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
+app.config["SESSION_COOKIE_SERCURE"] = True
+app.config["SESSION_COOKIE_DOMAIN"] = "library-klmc.onrender.com"
+# app.config.update(
+#     SESSION_COOKIE_SECURE=True,
+#     SESSION_COOKIE_SAMESITE="Lax",
+# )
 # app.config["SESSION_COOKIE_DOMAIN"] = ".https://library-klmc.onrender.com/"
 # dev_env = "http://127.0.0.1:9000"
 # prod_env = "https://library-klmc.onrender.com/"
