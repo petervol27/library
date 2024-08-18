@@ -91,12 +91,6 @@ def get_session():
         return jsonify({"response": "no session set"})
 
 
-# @app.route("/set_test_session")
-# def set_test_session():
-#     session["test"] = "This is a test session"
-#     resp = make_response(jsonify({"response": "Session set"}))
-#     resp.set_cookie("test_cookie", session.get("reader"))
-#     return resp
 @app.route("/set_test_session")
 def set_test_session():
     conn = get_connection()
