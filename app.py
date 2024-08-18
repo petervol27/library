@@ -58,6 +58,10 @@ def create_tables():
     )
 
 
+def set_session(obj):
+    session["reader"] = obj
+
+
 @app.route("/", methods=["POST", "GET"])
 def login():
     conn = get_connection()
@@ -70,8 +74,8 @@ def login():
         )
         row = cursor.fetchone()
         if row:
-            session["reader"] = dict(row)
-            return jsonify({"response": "success", "reader": session["reader"]})
+            set_session(dict(row))
+            return jsonify({"response": "success", "reader": dict(row)})
         else:
             return jsonify({"response": "failed", "reader": "no user exists"})
     cursor.execute("SELECT * FROM readers")
