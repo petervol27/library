@@ -19,6 +19,8 @@ app.config.update(
     SESSION_COOKIE_SAMESITE="None",  # Required for cross-site requests
 )
 # app.config["SESSION_COOKIE_DOMAIN"] = ".https://library-klmc.onrender.com/"
+# dev_env = "http://127.0.0.1:9000"
+# prod_env = "https://library-klmc.onrender.com/"
 
 
 def get_connection():
@@ -60,7 +62,7 @@ def login():
         else:
             return jsonify({"response": "failed", "reader": "no user exists"})
     if request.method == "GET":
-        cursor.execute("SELECT * FROM users")
+        cursor.execute("SELECT * FROM readers")
         rows = cursor.fetchall()
         users = [dict(row) for row in rows]
         return users
@@ -69,6 +71,7 @@ def login():
 @app.route("/get_session/")
 def get_session():
     reader = session.get("reader")
+    print(reader)
     return jsonify(reader=reader)
 
 
