@@ -113,7 +113,7 @@ def set_test_session():
 
 @app.route("/get_test_session")
 def get_test_session():
-    test_value = session.get("test", "No session found")
+    test_value = session.get("reader", "No session found")
     print("Session value:", test_value)  # Check the server logs for this output
     return jsonify({"session_value": test_value})
 
