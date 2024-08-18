@@ -70,7 +70,6 @@ def login():
         )
         row = cursor.fetchone()
         if row:
-            session.permanent = True
             session["reader"] = dict(row)
             return jsonify({"response": "success", "reader": session["reader"]})
         else:
