@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, make_response
 
 # from flask_session import Session
 from flask_cors import CORS
@@ -18,7 +18,7 @@ app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
 # Session(app)
 app.config["SESSION_COOKIE_SAMESITE"] = "None"
 app.config["SESSION_COOKIE_SERCURE"] = True
-app.config["SESSION_COOKIE_DOMAIN"] = "library-klmc.onrender.com"
+app.config["SESSION_COOKIE_DOMAIN"] = "https://library-klmc.onrender.com"
 # app.config.update(
 #     SESSION_COOKIE_SECURE=True,
 #     SESSION_COOKIE_SAMESITE="Lax",
@@ -87,7 +87,9 @@ def get_session():
 @app.route("/set_test_session")
 def set_test_session():
     session["test"] = "This is a test session"
-    return jsonify({"response": "Session set"})
+    resp = make_response(jsonify({"response": "Session set"}))
+    resp.set_cookie("test_cookie", "test_value")
+    return resp
 
 
 @app.route("/get_test_session")
