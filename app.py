@@ -19,6 +19,7 @@ app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SERCURE"] = False
 app.config["SESSION_COOKIE_DOMAIN"] = "https://library-klmc.onrender.com"
+app.config["SESSION_COOKIE_PATH"] = "/"
 # app.config.update(
 #     SESSION_COOKIE_SECURE=True,
 #     SESSION_COOKIE_SAMESITE="Lax",
@@ -64,8 +65,6 @@ def login():
         if row:
             session.permanent = True
             session["reader"] = dict(row)
-            resp = make_response(jsonify({"response": "Session set"}))
-            resp.set_cookie("test_cookie", session.get("reader"))
             return jsonify({"response": "success", "reader": session["reader"]})
         else:
             return jsonify({"response": "failed", "reader": "no user exists"})
@@ -86,17 +85,22 @@ def get_session():
         return jsonify({"response": "no session set"})
 
 
+# @app.route("/set_test_session")
+# def set_test_session():
+#     session["test"] = "This is a test session"
+#     resp = make_response(jsonify({"response": "Session set"}))
+#     resp.set_cookie("test_cookie", session.get("reader"))
+#     return resp
 @app.route("/set_test_session")
 def set_test_session():
     session["test"] = "This is a test session"
-    resp = make_response(jsonify({"response": "Session set"}))
-    resp.set_cookie("test_cookie", session.get("reader"))
-    return resp
+    return jsonify({"response": "Session set"})
 
 
 @app.route("/get_test_session")
 def get_test_session():
-    test_value = session.get("test_cookie", "No session found")
+    test_value = session.get("test", "No session found")
+    print("Session value:", test_value)  # Check the server logs for this output
     return jsonify({"session_value": test_value})
 
 
