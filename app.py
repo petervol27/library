@@ -99,14 +99,16 @@ def get_session():
 def set_test_session():
     conn = get_connection()
     cursor = conn.cursor()
-
+    user_data = request.json
     cursor.execute(
-        "SELECT * FROM readers WHERE id=1",
+        "SELECT * FROM readers WHERE email=? AND password=?",
+        (user_data["email"], user_data["password"]),
     )
     row = cursor.fetchone()
     if row:
-        session["test"] = dict(row)
-        return jsonify({"response": "Session set"})
+        session["reader"] = dict(row)
+        print("session set:", session.get("reader"))
+        return jsonify({"response": "success", "reader": dict(row)})
 
 
 @app.route("/get_test_session")

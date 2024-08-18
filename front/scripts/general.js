@@ -55,6 +55,7 @@ const checkLogin = async () => {
 
 const getBooks = async function () {
   const response = await axios.get('https://library-klmc.onrender.com/books/', {
+    withCredentials: true,
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
@@ -68,6 +69,7 @@ const checkRented = async () => {
     'https://library-klmc.onrender.com/books_rented/',
     {
       userId: user.id,
+      withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
