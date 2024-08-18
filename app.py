@@ -8,7 +8,7 @@ from datetime import timedelta, datetime
 # import redis
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=["https://petervol27.github.io"])
 # , origins=["https://petervol27.github.io"]
 app.secret_key = "secret key"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
@@ -58,10 +58,6 @@ def create_tables():
     )
 
 
-def set_session(obj):
-    session["reader"] = obj
-
-
 @app.route("/", methods=["POST", "GET"])
 def login():
     conn = get_connection()
@@ -74,7 +70,8 @@ def login():
         )
         row = cursor.fetchone()
         if row:
-            set_session(dict(row))
+            session["reader"] = dict(row)
+            print("session set:", session.get("reader"))
             return jsonify({"response": "success", "reader": dict(row)})
         else:
             return jsonify({"response": "failed", "reader": "no user exists"})
