@@ -1,29 +1,29 @@
 from flask import Flask, request, jsonify, session
-from flask_session import Session
+
+# from flask_session import Session
 from flask_cors import CORS
 import sqlite3
 from datetime import timedelta, datetime
-import redis
+
+# import redis
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 app.secret_key = "secret key"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
 # app.config["SESSION_TYPE"] = "redis"
-app.config["SESSION_TYPE"] = "filesystem"
+# app.config["SESSION_TYPE"] = "filesystem"
 # app.config["SESSION_REDIS"] = redis.from_url("redis://red-cr0e93rv2p9s73a6jd50:6379")
 # app.config["SESSION_REDIS"] = redis.from_url("redis://localhost:6379/0")
 # Session(app)
 app.config.update(
-    SESSION_COOKIE_SECURE=True,  # Set to True if using HTTPS
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE="Lax",  # Adjust as needed: 'Lax', 'Strict', or 'None'
-    SESSION_COOKIE_DOMAIN=None,  # Ensure it's None if you want the cookie to be valid for the domain it's set on
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SAMESITE="Lax",
 )
 # app.config["SESSION_COOKIE_DOMAIN"] = ".https://library-klmc.onrender.com/"
 # dev_env = "http://127.0.0.1:9000"
 # prod_env = "https://library-klmc.onrender.com/"
-Session(app)
+# Session(app)
 
 
 def get_connection():
@@ -61,6 +61,7 @@ def login():
         if row:
             session.permanent = True
             session["reader"] = dict(row)
+            print("Session set:", session["reader"])
             return jsonify({"response": "success", "reader": dict(row)})
         else:
             return jsonify({"response": "failed", "reader": "no user exists"})
