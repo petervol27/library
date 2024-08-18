@@ -8,18 +8,25 @@ from datetime import timedelta, datetime
 # import redis
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["https://petervol27.github.io"])
+CORS(app, supports_credentials=True)
+# , origins=["https://petervol27.github.io"]
 app.secret_key = "secret key"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
+app.config.update(
+    SESSION_COOKIE_SECURE=True,  # Use True if your site uses HTTPS
+    SESSION_COOKIE_SAMESITE="Lax",  # Adjust as needed
+    SESSION_COOKIE_HTTPONLY=True,  # Recommended for security
+    SESSION_COOKIE_DOMAIN=".library-klmc.onrender.com",  # Update based on your domain
+)
 # app.config["SESSION_TYPE"] = "redis"
 # app.config["SESSION_TYPE"] = "filesystem"
 # app.config["SESSION_REDIS"] = redis.from_url("redis://red-cr0e93rv2p9s73a6jd50:6379")
 # app.config["SESSION_REDIS"] = redis.from_url("redis://localhost:6379/0")
 # Session(app)
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["SESSION_COOKIE_SERCURE"] = False
-app.config["SESSION_COOKIE_DOMAIN"] = "https://library-klmc.onrender.com"
-app.config["SESSION_COOKIE_PATH"] = "/"
+# app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+# app.config["SESSION_COOKIE_SERCURE"] = True
+# app.config["SESSION_COOKIE_DOMAIN"] = "https://library-klmc.onrender.com"
+# app.config["SESSION_COOKIE_PATH"] = "/"
 # app.config.update(
 #     SESSION_COOKIE_SECURE=True,
 #     SESSION_COOKIE_SAMESITE="Lax",
