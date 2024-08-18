@@ -16,8 +16,8 @@ app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
 # app.config["SESSION_REDIS"] = redis.from_url("redis://red-cr0e93rv2p9s73a6jd50:6379")
 # app.config["SESSION_REDIS"] = redis.from_url("redis://localhost:6379/0")
 # Session(app)
-app.config["SESSION_COOKIE_SAMESITE"] = "None"
-app.config["SESSION_COOKIE_SERCURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SERCURE"] = False
 app.config["SESSION_COOKIE_DOMAIN"] = "https://library-klmc.onrender.com"
 # app.config.update(
 #     SESSION_COOKIE_SECURE=True,
@@ -64,6 +64,8 @@ def login():
         if row:
             session.permanent = True
             session["reader"] = dict(row)
+            resp = make_response(jsonify({"response": "Session set"}))
+            resp.set_cookie("test_cookie", session.get("reader"))
             return jsonify({"response": "success", "reader": session["reader"]})
         else:
             return jsonify({"response": "failed", "reader": "no user exists"})
@@ -88,7 +90,7 @@ def get_session():
 def set_test_session():
     session["test"] = "This is a test session"
     resp = make_response(jsonify({"response": "Session set"}))
-    resp.set_cookie("test_cookie", "test_value")
+    resp.set_cookie("test_cookie", session.get("reader"))
     return resp
 
 
