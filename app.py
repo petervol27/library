@@ -99,8 +99,16 @@ def get_session():
 #     return resp
 @app.route("/set_test_session")
 def set_test_session():
-    session["test"] = "This is a test session"
-    return jsonify({"response": "Session set"})
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT * FROM readers WHERE id=1",
+    )
+    row = cursor.fetchone()
+    if row:
+        session["test"] = dict(row)
+        return jsonify({"response": "Session set"})
 
 
 @app.route("/get_test_session")
