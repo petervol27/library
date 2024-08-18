@@ -61,8 +61,7 @@ def login():
         if row:
             session.permanent = True
             session["reader"] = dict(row)
-            print("Session set:", session["reader"])
-            return jsonify({"response": "success", "reader": dict(row)})
+            return jsonify({"response": "success", "reader": session["reader"]})
         else:
             return jsonify({"response": "failed", "reader": "no user exists"})
     cursor.execute("SELECT * FROM readers")
@@ -75,8 +74,10 @@ def login():
 def get_session():
     reader = session.get("reader")
     if reader:
+        print("reader:" + reader)
         return jsonify(reader=reader)
     else:
+        print("no session set")
         return jsonify({"response": "no session set"})
 
 
