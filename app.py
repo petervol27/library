@@ -59,10 +59,11 @@ def login():
             return jsonify({"response": "success", "reader": dict(row)})
         else:
             return jsonify({"response": "failed", "reader": "no user exists"})
-    cursor.execute("SELECT * FROM users")
-    rows = cursor.fetchall()
-    users = [dict(row) for row in rows]
-    return users
+    if request.method == "GET":
+        cursor.execute("SELECT * FROM users")
+        rows = cursor.fetchall()
+        users = [dict(row) for row in rows]
+        return users
 
 
 @app.route("/get_session/")
