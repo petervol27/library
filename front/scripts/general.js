@@ -3,8 +3,6 @@ const logout = async () => {
     'https://library-klmc.onrender.com/logout/',
     {
       withCredentials: true,
-    },
-    {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -20,8 +18,6 @@ const getSession = async () => {
     'https://library-klmc.onrender.com/get_session/',
     {
       withCredentials: true,
-    },
-    {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -72,8 +68,6 @@ const checkRented = async () => {
     'https://library-klmc.onrender.com/books_rented/',
     {
       userId: user.id,
-    },
-    {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -88,8 +82,6 @@ const returnBook = async (bookId) => {
     `https://library-klmc.onrender.com/return_book/${bookId}`,
     {
       withCredentials: true,
-    },
-    {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',

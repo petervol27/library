@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, session, make_response
 
 # from flask_session import Session
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import sqlite3
 from datetime import timedelta, datetime
 
@@ -59,6 +59,7 @@ def create_tables():
 
 
 @app.route("/", methods=["POST", "GET"])
+@cross_origin(supports_credentials=True)
 def login():
     conn = get_connection()
     cursor = conn.cursor()
@@ -82,8 +83,10 @@ def login():
 
 
 @app.route("/get_session/")
+@cross_origin(supports_credentials=True)
 def get_session():
     reader = session.get("reader")
+
     if reader:
         print("reader:" + reader)
         return jsonify(reader=reader)
