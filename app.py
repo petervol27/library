@@ -45,18 +45,23 @@ def create_tables():
 def login():
     conn = get_connection()
     cursor = conn.cursor()
-    user_data = request.json
-    cursor.execute(
-        "SELECT * FROM readers WHERE email=? AND password=?",
-        (user_data["email"], user_data["password"]),
-    )
-    row = cursor.fetchone()
-    if row:
-        session.permanent = True
-        session["reader"] = dict(row)
-        return jsonify({"response": "success", "reader": dict(row)})
-    else:
-        return jsonify({"response": "failed", "reader": "no user exists"})
+    if request.method == "POST":
+        user_data = request.json
+        cursor.execute(
+            "SELECT * FROM readers WHERE email=? AND password=?",
+            (user_data["email"], user_data["password"]),
+        )
+        row = cursor.fetchone()
+        if row:
+            session.permanent = True
+            session["reader"] = dict(row)
+            return jsonify({"response": "success", "reader": dict(row)})
+        else:
+            return jsonify({"response": "failed", "reader": "no user exists"})
+    cursor.execute("SELECT * FROM users")
+    rows = cursor.fetchall()
+    users = [dict(row) for row in rows]
+    return users
 
 
 @app.route("/get_session/")
