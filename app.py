@@ -15,8 +15,10 @@ app.config["SESSION_TYPE"] = "filesystem"
 # app.config["SESSION_REDIS"] = redis.from_url("redis://localhost:6379/0")
 # Session(app)
 app.config.update(
-    SESSION_COOKIE_SECURE=True,
-    SESSION_COOKIE_SAMESITE="None",  # Required for cross-site requests
+    SESSION_COOKIE_SECURE=True,  # Set to True if using HTTPS
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",  # Adjust as needed: 'Lax', 'Strict', or 'None'
+    SESSION_COOKIE_DOMAIN=None,  # Ensure it's None if you want the cookie to be valid for the domain it's set on
 )
 # app.config["SESSION_COOKIE_DOMAIN"] = ".https://library-klmc.onrender.com/"
 # dev_env = "http://127.0.0.1:9000"
