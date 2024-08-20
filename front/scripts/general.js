@@ -16,22 +16,26 @@ const logout = async () => {
 };
 const getSession = async () => {
   const token = localStorage.getItem('jwt_token');
-  const response = await axios.get(
-    'https://library-klmc.onrender.com/get_session/',
-    {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
+  if (token) {
+    const response = await axios.get(
+      'https://library-klmc.onrender.com/get_session/',
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      }
+    );
+    if (response.data.message != 'Token found') {
+      window.location.href = '../index.html';
+    } else {
+      const user = { id: response.data.userId, name: response.data.userName };
+      return user;
     }
-  );
-  if (response.data.message != 'Token found') {
-    window.location.href = '../index.html';
   } else {
-    const user = { id: response.data.userId, name: response.data.userName };
-    return user;
+    window.location.href = '../index.html';
   }
 };
 
