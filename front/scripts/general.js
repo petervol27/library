@@ -1,5 +1,5 @@
 const logout = async () => {
-  const token = localStorage.getItem('jwt_token');
+  localStorage.removeItem('jwt_token');
   const response = await axios.get(
     'https://library-klmc.onrender.com/logout/',
     {
@@ -11,7 +11,6 @@ const logout = async () => {
     }
   );
   if (response) {
-    localStorage.removeItem('jwt_token');
     window.location.href = '../index.html';
   }
 };
