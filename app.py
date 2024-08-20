@@ -56,7 +56,7 @@ def login():
                 jsonify({"response": "success", "message": "Logged In"})
             )
             resp.set_cookie(
-                "jwt_token", token, httponly=True, secure=True, samesite="Lax"
+                "jwt_token", token, httponly=True, secure=True, samesite="Strict"
             )
             return resp
         else:
@@ -93,7 +93,7 @@ def get_session():
 def logout():
     resp = make_response(jsonify({"response": "logged out"}))
     resp.set_cookie(
-        "jwt_token", "", httponly=True, expires=0, secure=True, samesite="Lax"
+        "jwt_token", "", httponly=True, expires=0, secure=True, samesite="Strict"
     )
     return resp
 
