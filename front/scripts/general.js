@@ -1,11 +1,14 @@
 const logout = async () => {
-  const response = await axios.get('http://127.0.0.1:9000/logout/', {
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-  });
+  const response = await axios.get(
+    'https://library-klmc.onrender.com/logout/',
+    {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    }
+  );
   if (response) {
     window.location.href = '../index.html';
   }
