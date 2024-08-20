@@ -55,7 +55,9 @@ def login():
             resp = make_response(
                 jsonify({"response": "success", "message": "Logged In"})
             )
-            resp.set_cookie("jwt_token", token, httponly=True, secure=True)
+            resp.set_cookie(
+                "jwt_token", token, httponly=True, secure=True, samesite="None"
+            )
             return resp
         else:
             return jsonify({"response": "failed", "reader": "no user exists"})

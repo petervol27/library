@@ -92,7 +92,6 @@
     login = response.data;
     if (login.response == 'success') {
       console.log(login);
-      console.log('success');
       window.location.href = './front/main.html';
     } else {
       document.getElementById('errortxt').innerHTML = 'Wrong Credentials';
