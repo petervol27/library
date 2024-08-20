@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, make_response
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 import sqlite3
 from datetime import timedelta, datetime
 import jwt
@@ -179,7 +179,7 @@ def return_book(id):
     row = cursor.fetchone()
     book = dict(row)
     payload = decode_jwt()
-    reader = payload.get('user_id')
+    reader = payload.get("user_id")
     cursor.execute(
         "DELETE FROM rented WHERE bookId=? AND readerId=?",
         (book.get("id"), reader),
