@@ -16,7 +16,6 @@ const logout = async () => {
 };
 const getSession = async () => {
   const token = localStorage.getItem('jwt_token');
-  console.log(token);
   if (token) {
     const response = await axios.get(
       'https://library-klmc.onrender.com/get_session/',
@@ -44,6 +43,7 @@ const checkLogin = async () => {
   const user = await getSession();
   const navbar = document.getElementById('navbar');
   const isActive = window.location.pathname != '/library/front/main.html';
+  // in production change the path to /library/front... in development just /front/...
   const activeClass = isActive ? 'active' : '';
   if (user) {
     document.getElementById('user-info').textContent = `Hello, ${user['name']}`;
@@ -92,7 +92,7 @@ const checkRented = async () => {
 const returnBook = async (bookId) => {
   const token = localStorage.getItem('jwt_token');
   const response = await axios.get(
-    `https://library-klmc.onrender.com/return_book/${bookId}`,
+    `https://library-klmc.onrender.com/return_book/${bookId}/`,
     {
       withCredentials: true,
       headers: {

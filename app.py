@@ -173,6 +173,7 @@ def rent_book(id):
         conn.commit()
         conn.close()
         return jsonify({"response": "success", "message": "Book Rented Succesfully"})
+    return jsonify({"response": "fail", "message": "Failure"})
 
 
 @app.route("/return_book/<int:id>/")

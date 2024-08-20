@@ -75,6 +75,13 @@
 <script>
   document.getElementById('logoutBtn').addEventListener('click', logout);
   checkLogin();
+  const checkAdmin = async () => {
+    const user = await getSession();
+    if (user.id != 1) {
+      window.location.href = './main.html';
+    }
+  };
+  checkAdmin();
   const getReaders = async () => {
     const response = await axios.get(
       'https://library-klmc.onrender.com/readers/',
