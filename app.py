@@ -90,7 +90,7 @@ def get_session():
 @app.route("/logout/")
 def logout():
     resp = make_response(jsonify({"response": "logged out"}))
-    resp.set_cookie("jwt_token", "", expires=0, secure=True)
+    resp.set_cookie("jwt_token", "", expires=0, secure=True, samesite="None")
     return resp
 
 
