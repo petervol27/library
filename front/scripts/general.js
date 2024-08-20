@@ -14,11 +14,13 @@ const logout = async () => {
   }
 };
 const getSession = async () => {
+  const token = localStorage.getItem('jwt_token');
   const response = await axios.get(
     'https://library-klmc.onrender.com/get_session/',
     {
       withCredentials: true,
       headers: {
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
@@ -34,7 +36,6 @@ const getSession = async () => {
 
 const checkLogin = async () => {
   const user = await getSession();
-  console.log(user);
   const navbar = document.getElementById('navbar');
   const isActive = window.location.pathname !== '/front/main.html';
   const activeClass = isActive ? 'active' : '';

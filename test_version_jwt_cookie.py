@@ -52,9 +52,13 @@ def login():
                 "exp": datetime.now() + timedelta(minutes=30),
             }
             token = jwt.encode(payload, app.secret_key, algorithm="HS256")
-            return jsonify(
-                {"response": "success", "message": "Logged In", "token": token}
+            resp = make_response(
+                jsonify({"response": "success", "message": "Logged In"})
             )
+            resp.set_cookie(
+                "jwt_token", token, httponly=True, secure=True, samesite="Strict"
+            )
+            return resp
         else:
             return jsonify({"response": "failed", "reader": "no user exists"})
     cursor.execute("SELECT * FROM readers")
@@ -63,9 +67,10 @@ def login():
     return users
 
 
-def decode_jwt(token):
-    payload = jwt.decode(token, app.secret_key, algorithms=["HS256"])
-    if payload:
+def decode_jwt():
+    token = request.cookies.get("jwt_token")
+    if token:
+        payload = jwt.decode(token, app.secret_key, algorithms=["HS256"])
         return payload
     else:
         return False
@@ -73,10 +78,8 @@ def decode_jwt(token):
 
 @app.route("/get_session/")
 def get_session():
-    auth_header = request.headers.get("Authorization")
-    if auth_header:
-        token = auth_header.split(" ")[1]
-        payload = decode_jwt(token)
+    payload = decode_jwt()
+    if payload:
         user_id = payload.get("user_id")
         user_name = payload.get("user_name")
         return jsonify(

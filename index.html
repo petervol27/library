@@ -92,6 +92,7 @@
     login = response.data;
     if (login.response == 'success') {
       console.log(login);
+      localStorage.setItem('jwt_token', response.data.token);
       window.location.href = './front/main.html';
     } else {
       document.getElementById('errortxt').innerHTML = 'Wrong Credentials';
