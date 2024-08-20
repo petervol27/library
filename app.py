@@ -186,6 +186,7 @@ def return_book(id):
     if auth_header:
         token = auth_header.split(" ")[1]
         payload = decode_jwt(token)
+        print(payload)
         reader = payload.get("user_id")
         cursor.execute(
             "DELETE FROM rented WHERE bookId=? AND readerId=?",

@@ -16,6 +16,7 @@ const logout = async () => {
 };
 const getSession = async () => {
   const token = localStorage.getItem('jwt_token');
+  console.log(token);
   if (token) {
     const response = await axios.get(
       'https://library-klmc.onrender.com/get_session/',
