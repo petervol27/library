@@ -1,14 +1,11 @@
 const logout = async () => {
-  const response = await axios.get(
-    'https://library-klmc.onrender.com/logout/',
-    {
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-    }
-  );
+  const response = await axios.get('http://127.0.0.1:9000/logout/', {
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  });
   if (response) {
     window.location.href = '../index.html';
   }
@@ -24,10 +21,12 @@ const getSession = async () => {
       },
     }
   );
-  const user = response.data.reader;
-  console.log(response.data);
-  console.log(user);
-  return user;
+  if (response.data.message != 'Token found') {
+    window.location.href = '../index.html';
+  } else {
+    const user = { id: response.data.userId, name: response.data.userName };
+    return user;
+  }
 };
 
 const checkLogin = async () => {

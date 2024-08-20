@@ -1,42 +1,17 @@
-from flask import Flask, request, jsonify, session, make_response
-
-# from flask_session import Session
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS, cross_origin
 import sqlite3
 from datetime import timedelta, datetime
+import jwt
 
-# import redis
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["https://petervol27.github.io"])
-# , origins=["https://petervol27.github.io"]
-app.secret_key = "secret key"
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
-app.config.update(
-    SESSION_COOKIE_SECURE=True,  # Use True if your site uses HTTPS
-    SESSION_COOKIE_SAMESITE="Lax",  # Adjust as needed
-    SESSION_COOKIE_HTTPONLY=True,  # Recommended for security
-    SESSION_COOKIE_DOMAIN=".library-klmc.onrender.com",  # Update based on your domain
-)
-# app.config["SESSION_TYPE"] = "redis"
-# app.config["SESSION_TYPE"] = "filesystem"
-# app.config["SESSION_REDIS"] = redis.from_url("redis://red-cr0e93rv2p9s73a6jd50:6379")
-# app.config["SESSION_REDIS"] = redis.from_url("redis://localhost:6379/0")
-# Session(app)
-# app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-# app.config["SESSION_COOKIE_SERCURE"] = True
-# app.config["SESSION_COOKIE_DOMAIN"] = "https://library-klmc.onrender.com"
-# app.config["SESSION_COOKIE_PATH"] = "/"
-# app.config.update(
-#     SESSION_COOKIE_SECURE=True,
-#     SESSION_COOKIE_SAMESITE="Lax",
-# )
-# app.config["SESSION_COOKIE_DOMAIN"] = ".https://library-klmc.onrender.com/"
-# dev_env = "http://127.0.0.1:9000"
-# prod_env = "https://library-klmc.onrender.com/"
-# Session(app)
+CORS(app, supports_credentials=True)
+app.secret_key = "secret_key"
 
 
+# development: http://127.0.0.1:9000/
+# production: https://library-klmc.onrender.com/
 def get_connection():
     conn = sqlite3.connect("data.db")
     conn.row_factory = sqlite3.Row
@@ -59,7 +34,6 @@ def create_tables():
 
 
 @app.route("/", methods=["POST", "GET"])
-@cross_origin(supports_credentials=True)
 def login():
     conn = get_connection()
     cursor = conn.cursor()
@@ -71,9 +45,18 @@ def login():
         )
         row = cursor.fetchone()
         if row:
-            session["reader"] = dict(row)
-            print("session set:", session.get("reader"))
-            return jsonify({"response": "success", "reader": dict(row)})
+            user = dict(row)
+            payload = {
+                "user_id": user.get("id"),
+                "user_name": user.get("name"),
+                "exp": datetime.now() + timedelta(minutes=30),
+            }
+            token = jwt.encode(payload, app.secret_key, algorithm="HS256")
+            resp = make_response(
+                jsonify({"response": "success", "message": "Logged In"})
+            )
+            resp.set_cookie("jwt_token", token, httponly=True, secure=True)
+            return resp
         else:
             return jsonify({"response": "failed", "reader": "no user exists"})
     cursor.execute("SELECT * FROM readers")
@@ -82,46 +65,33 @@ def login():
     return users
 
 
-@app.route("/get_session/")
-@cross_origin(supports_credentials=True)
-def get_session():
-    reader = session.get("reader")
-
-    if reader:
-        print("reader:" + reader)
-        return jsonify(reader=reader)
+def decode_jwt():
+    token = request.cookies.get("jwt_token")
+    if token:
+        payload = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+        return payload
     else:
-        print("no session set")
-        return jsonify({"response": "no session set"})
+        return False
 
 
-@app.route("/set_test_session", methods=["POST", "GET"])
-def set_test_session():
-    conn = get_connection()
-    cursor = conn.cursor()
-    user_data = request.json
-    cursor.execute(
-        "SELECT * FROM readers WHERE email=? AND password=?",
-        (user_data["email"], user_data["password"]),
-    )
-    row = cursor.fetchone()
-    if row:
-        session["reader"] = dict(row)
-        print("session set:", session.get("reader"))
-        return jsonify({"response": "success", "reader": dict(row)})
-
-
-@app.route("/get_test_session")
-def get_test_session():
-    test_value = session.get("reader", "No session found")
-    print("Session value:", test_value)  # Check the server logs for this output
-    return jsonify({"session_value": test_value})
+@app.route("/get_session/")
+def get_session():
+    payload = decode_jwt()
+    if payload:
+        user_id = payload.get("user_id")
+        user_name = payload.get("user_name")
+        return jsonify(
+            {"userId": user_id, "userName": user_name, "message": "Token found"}
+        )
+    else:
+        return jsonify({"message": "Token not found"})
 
 
 @app.route("/logout/")
 def logout():
-    session.pop("reader", None)
-    return jsonify({"response": "logged out"})
+    resp = make_response(jsonify({"response": "logged out"}))
+    resp.set_cookie("jwt_token", "", expires=0, httponly=True, secure=True)
+    return resp
 
 
 @app.route("/books/", methods=["GET"])
@@ -171,10 +141,11 @@ def rent_book(id):
     cursor.execute("SELECT * FROM books WHERE id=?", (id,))
     row = cursor.fetchone()
     book = dict(row)
-    reader = session.get("reader")
+    payload = decode_jwt()
+    reader = payload.get("user_id")
     cursor.execute(
         "SELECT * FROM rented WHERE bookId=? AND readerId=?",
-        (book.get("id"), reader.get("id")),
+        (book.get("id"), reader),
     )
     row = cursor.fetchone()
     if row:
@@ -183,7 +154,7 @@ def rent_book(id):
         )
     cursor.execute(
         "SELECT COUNT(*) FROM rented WHERE readerId=?",
-        (reader.get("id"),),
+        (reader,),
     )
     rent_limit = cursor.fetchone()[0] + 1
 
@@ -193,7 +164,7 @@ def rent_book(id):
         )
     cursor.execute(
         "INSERT INTO rented(bookId,readerId,rentDate,returnDate) VALUES (?,?,datetime('now','localtime'),datetime('now','+10 days','localtime'))",
-        (book.get("id"), reader.get("id")),
+        (book.get("id"), reader),
     )
     conn.commit()
     conn.close()
@@ -207,10 +178,11 @@ def return_book(id):
     cursor.execute("SELECT * FROM books WHERE id=?", (id,))
     row = cursor.fetchone()
     book = dict(row)
-    reader = session.get("reader")
+    payload = decode_jwt()
+    reader = payload.get('user_id')
     cursor.execute(
         "DELETE FROM rented WHERE bookId=? AND readerId=?",
-        (book.get("id"), reader.get("id")),
+        (book.get("id"), reader),
     )
     conn.commit()
     conn.close()
