@@ -94,4 +94,5 @@ const returnBook = async (bookId) => {
     }
   );
   alert(response.data.message);
+  window.location.reload();
 };
