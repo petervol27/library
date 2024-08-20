@@ -142,34 +142,37 @@ def rent_book(id):
     cursor.execute("SELECT * FROM books WHERE id=?", (id,))
     row = cursor.fetchone()
     book = dict(row)
-    payload = decode_jwt()
-    reader = payload.get("user_id")
-    cursor.execute(
-        "SELECT * FROM rented WHERE bookId=? AND readerId=?",
-        (book.get("id"), reader),
-    )
-    row = cursor.fetchone()
-    if row:
-        return jsonify(
-            {"response": "failed", "message": "You have already Rented this book"}
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        token = auth_header.split(" ")[1]
+        payload = decode_jwt(token)
+        reader = payload.get("user_id")
+        cursor.execute(
+            "SELECT * FROM rented WHERE bookId=? AND readerId=?",
+            (book.get("id"), reader),
         )
-    cursor.execute(
-        "SELECT COUNT(*) FROM rented WHERE readerId=?",
-        (reader,),
-    )
-    rent_limit = cursor.fetchone()[0] + 1
+        row = cursor.fetchone()
+        if row:
+            return jsonify(
+                {"response": "failed", "message": "You have already Rented this book"}
+            )
+        cursor.execute(
+            "SELECT COUNT(*) FROM rented WHERE readerId=?",
+            (reader,),
+        )
+        rent_limit = cursor.fetchone()[0] + 1
 
-    if rent_limit > 3:
-        return jsonify(
-            {"response": "failed", "message": "You have already Rented Three Books"}
+        if rent_limit > 3:
+            return jsonify(
+                {"response": "failed", "message": "You have already Rented Three Books"}
+            )
+        cursor.execute(
+            "INSERT INTO rented(bookId,readerId,rentDate,returnDate) VALUES (?,?,datetime('now','localtime'),datetime('now','+10 days','localtime'))",
+            (book.get("id"), reader),
         )
-    cursor.execute(
-        "INSERT INTO rented(bookId,readerId,rentDate,returnDate) VALUES (?,?,datetime('now','localtime'),datetime('now','+10 days','localtime'))",
-        (book.get("id"), reader),
-    )
-    conn.commit()
-    conn.close()
-    return jsonify({"response": "success", "message": "Book Rented Succesfully"})
+        conn.commit()
+        conn.close()
+        return jsonify({"response": "success", "message": "Book Rented Succesfully"})
 
 
 @app.route("/return_book/<int:id>/")
@@ -179,15 +182,18 @@ def return_book(id):
     cursor.execute("SELECT * FROM books WHERE id=?", (id,))
     row = cursor.fetchone()
     book = dict(row)
-    payload = decode_jwt()
-    reader = payload.get("user_id")
-    cursor.execute(
-        "DELETE FROM rented WHERE bookId=? AND readerId=?",
-        (book.get("id"), reader),
-    )
-    conn.commit()
-    conn.close()
-    return jsonify({"response": "success", "message": "Book Returned Succesfully"})
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        token = auth_header.split(" ")[1]
+        payload = decode_jwt(token)
+        reader = payload.get("user_id")
+        cursor.execute(
+            "DELETE FROM rented WHERE bookId=? AND readerId=?",
+            (book.get("id"), reader),
+        )
+        conn.commit()
+        conn.close()
+        return jsonify({"response": "success", "message": "Book Returned Succesfully"})
 
 
 if __name__ == "__main__":

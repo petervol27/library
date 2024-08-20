@@ -38,7 +38,7 @@ const getSession = async () => {
 const checkLogin = async () => {
   const user = await getSession();
   const navbar = document.getElementById('navbar');
-  const isActive = window.location.pathname !== '/front/main.html';
+  const isActive = window.location.pathname != '/library/front/main.html';
   const activeClass = isActive ? 'active' : '';
   if (user) {
     document.getElementById('user-info').textContent = `Hello, ${user['name']}`;
