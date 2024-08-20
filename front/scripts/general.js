@@ -34,6 +34,7 @@ const getSession = async () => {
 
 const checkLogin = async () => {
   const user = await getSession();
+  console.log(user);
   const navbar = document.getElementById('navbar');
   const isActive = window.location.pathname !== '/front/main.html';
   const activeClass = isActive ? 'active' : '';
