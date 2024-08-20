@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import sqlite3
 from datetime import timedelta, datetime
-import jwt
+from jwt import encode, decode, jwt
 
 
 app = Flask(__name__)
