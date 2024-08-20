@@ -141,6 +141,7 @@
   };
   displayBooks();
   const rentBook = async (bookId) => {
+    const token = localStorage.getItem('jwt_token');
     const response = await axios.get(
       `https://library-klmc.onrender.com/rent_book/${bookId}`,
       {
@@ -148,6 +149,7 @@
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
         },
       }
     );
