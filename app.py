@@ -1,21 +1,33 @@
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
-import sqlite3
 from datetime import timedelta, datetime
 import jwt
-
+import os
+from dotenv import load_dotenv
+import psycopg2
+from psycopg2.extras import DictCursor
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
-app.secret_key = "secret_key"
+load_dotenv()
+app.secret_key = os.getenv("secret_key")
+
+DATABASE_URL = "postgresql://pietro:cTEXJEBndJUKDLNchfSLjwqSR4jpCyBV@dpg-cr2dg1lsvqrc73fkkjdg-a.frankfurt-postgres.render.com/data_lm59"
 
 
 # development: http://127.0.0.1:9000/
 # production: https://library-klmc.onrender.com/
+# def get_connection():
+#     conn = psycopg2.connect(
+#         dbname="pietro-db",
+#         user="pietro",
+#         password="cTEXJEBndJUKDLNchfSLjwqSR4jpCyBV",
+#         host="dpg-cr2dg1lsvqrc73fkkjdg-a.frankfurt-postgres.render.com",
+#         port="5432",
+#     )
+#     return conn
 def get_connection():
-    conn = sqlite3.connect("data.db")
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
+    conn = psycopg2.connect(DATABASE_URL)
     return conn
 
 
@@ -23,24 +35,26 @@ def create_tables():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS books(id INTEGER PRIMARY KEY  AUTOINCREMENT,ISBN TEXT NOT NULL,name TEXT NOT NULL,author TEXT NOT NULL,quantity INTEGER,img TEXT NOT NULL)"
+        "CREATE TABLE IF NOT EXISTS books(id SERIAL PRIMARY KEY ,ISBN VARCHAR(20) UNIQUE ,name VARCHAR(150) NOT NULL,author VARCHAR(100) NOT NULL,quantity INT NOT NULL CHECK (quantity >= 0),img TEXT NOT NULL)"
     )
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS readers(id INTEGER PRIMARY KEY  AUTOINCREMENT,name TEXT NOT NULL,email TEXT NOT NULL,password TEXT NOT NULL,phone TEXT UNIQUE)"
+        "CREATE TABLE IF NOT EXISTS readers(id SERIAL PRIMARY KEY ,name VARCHAR(50) NOT NULL,email VARCHAR(100) UNIQUE NOT NULL,password VARCHAR(100) NOT NULL,phone VARCHAR(20) UNIQUE)"
     )
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS rented(id INTEGER  PRIMARY KEY AUTOINCREMENT,bookId,readerId,rentDate TEXT,returnDate TEXT,FOREIGN KEY(bookId) REFERENCES books(id),FOREIGN KEY(readerId) REFERENCES readers(id)) "
+        "CREATE TABLE IF NOT EXISTS rented(id SERIAL PRIMARY KEY ,bookId INT NOT NULL,readerId INT NOT NULL,rentDate DATE,returnDate DATE,FOREIGN KEY(bookId) REFERENCES books(id) ON DELETE CASCADE,FOREIGN KEY(readerId) REFERENCES readers(id) ON DELETE CASCADE) "
     )
+    conn.commit()
+    conn.close()
 
 
 @app.route("/", methods=["POST", "GET"])
 def login():
     conn = get_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=DictCursor)
     if request.method == "POST":
         user_data = request.json
         cursor.execute(
-            "SELECT * FROM readers WHERE email=? AND password=?",
+            "SELECT * FROM readers WHERE email=%s AND password=%s",
             (user_data["email"], user_data["password"]),
         )
         row = cursor.fetchone()
@@ -98,7 +112,7 @@ def logout():
 @app.route("/books/", methods=["GET"])
 def get_books():
     conn = get_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=DictCursor)
     cursor.execute(
         "SELECT books.id,books.ISBN,books.name,books.author,books.img,books.quantity-COALESCE(COUNT(rented.id),0) AS available_quantity , books.quantity AS total_quantity FROM books LEFT JOIN rented ON books.id = rented.bookId GROUP BY books.id"
     )
@@ -110,7 +124,7 @@ def get_books():
 @app.route("/books_rented/", methods=["GET", "POST"])
 def get_rented():
     conn = get_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=DictCursor)
     if request.method == "GET":
         cursor.execute("SELECT * FROM rented")
         rows = cursor.fetchall()
@@ -119,7 +133,7 @@ def get_rented():
     elif request.method == "POST":
         user = request.json
         user_id = user["userId"]
-        cursor.execute("SELECT * FROM rented WHERE readerId=?", (user_id,))
+        cursor.execute("SELECT * FROM rented WHERE readerId=%s", (user_id,))
         rows = cursor.fetchall()
         rented = [dict(row) for row in rows]
         return jsonify(rented)
@@ -128,8 +142,8 @@ def get_rented():
 @app.route("/readers/", methods=["GET"])
 def get_readers():
     conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM readers WHERE ID != 1")
+    cursor = conn.cursor(cursor_factory=DictCursor)
+    cursor.execute("SELECT * FROM readers WHERE id != 1")
     rows = cursor.fetchall()
     readers = [dict(row) for row in rows]
     return jsonify(readers)
@@ -138,8 +152,8 @@ def get_readers():
 @app.route("/rent_book/<int:id>/")
 def rent_book(id):
     conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM books WHERE id=?", (id,))
+    cursor = conn.cursor(cursor_factory=DictCursor)
+    cursor.execute("SELECT * FROM books WHERE id=%s", (id,))
     row = cursor.fetchone()
     book = dict(row)
     auth_header = request.headers.get("Authorization")
@@ -148,7 +162,7 @@ def rent_book(id):
         payload = decode_jwt(token)
         reader = payload.get("user_id")
         cursor.execute(
-            "SELECT * FROM rented WHERE bookId=? AND readerId=?",
+            "SELECT * FROM rented WHERE bookId=%s AND readerId=%s",
             (book.get("id"), reader),
         )
         row = cursor.fetchone()
@@ -157,7 +171,7 @@ def rent_book(id):
                 {"response": "failed", "message": "You have already Rented this book"}
             )
         cursor.execute(
-            "SELECT COUNT(*) FROM rented WHERE readerId=?",
+            "SELECT COUNT(*) FROM rented WHERE readerId=%s",
             (reader,),
         )
         rent_limit = cursor.fetchone()[0] + 1
@@ -167,7 +181,7 @@ def rent_book(id):
                 {"response": "failed", "message": "You have already Rented Three Books"}
             )
         cursor.execute(
-            "INSERT INTO rented(bookId,readerId,rentDate,returnDate) VALUES (?,?,datetime('now','localtime'),datetime('now','+10 days','localtime'))",
+            "INSERT INTO rented(bookId,readerId,rentDate,returnDate) VALUES (%s,%s,NOW(),NOW() + INTERVAL '10 days')",
             (book.get("id"), reader),
         )
         conn.commit()
@@ -179,18 +193,17 @@ def rent_book(id):
 @app.route("/return_book/<int:id>/")
 def return_book(id):
     conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM books WHERE id=?", (id,))
+    cursor = conn.cursor(cursor_factory=DictCursor)
+    cursor.execute("SELECT * FROM books WHERE id=%s", (id,))
     row = cursor.fetchone()
     book = dict(row)
     auth_header = request.headers.get("Authorization")
     if auth_header:
         token = auth_header.split(" ")[1]
         payload = decode_jwt(token)
-        print(payload)
         reader = payload.get("user_id")
         cursor.execute(
-            "DELETE FROM rented WHERE bookId=? AND readerId=?",
+            "DELETE FROM rented WHERE bookId=%s AND readerId=%s",
             (book.get("id"), reader),
         )
         conn.commit()
