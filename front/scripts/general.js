@@ -55,7 +55,7 @@ const checkLogin = async () => {
     const navItem = document.createElement('li');
     navItem.classList.add('nav-item');
     navItem.innerHTML = `<a class="nav-link ${isActive(
-      'mybooks.html'
+      'myBooks.html'
     )}" href="./myBooks.html">My Books</a>`;
     navbar.appendChild(navItem);
   } else {
