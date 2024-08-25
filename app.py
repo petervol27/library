@@ -12,7 +12,7 @@ CORS(app, supports_credentials=True)
 load_dotenv()
 app.secret_key = os.getenv("secret_key")
 
-DATABASE_URL = "postgresql://pietro:cTEXJEBndJUKDLNchfSLjwqSR4jpCyBV@dpg-cr2dg1lsvqrc73fkkjdg-a.frankfurt-postgres.render.com/data_lm59"
+DATABASE_URL = os.getenv("db_url")
 
 
 # development: http://127.0.0.1:9000/

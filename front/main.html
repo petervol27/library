@@ -73,7 +73,7 @@
     const rented = await checkRented();
     let rentedIds = [];
     for (rent of rented) {
-      rentedIds.push(rent.bookId);
+      rentedIds.push(rent.bookid);
     }
     const isReader = user.id != 1;
     const bookList = document.getElementById('bookList');

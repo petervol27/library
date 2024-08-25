@@ -104,13 +104,13 @@
     for (reader of readers) {
       let rentedHTML = '';
       for (rent of rented) {
-        if (rent.readerId == reader.id) {
+        if (rent.readerid == reader.id) {
           for (book of books) {
-            if (rent.bookId == book.id) {
-              let bookHTML = `<li >${book.ISBN} ${
+            if (rent.bookid == book.id) {
+              let bookHTML = `<li >${book.isbn} ${
                 book.name + ' by ' + book.author
-              } at ${rent.rentDate} ,  needs to return by ${
-                rent.returnDate
+              } at ${rent.rentdate} ,  needs to return by ${
+                rent.returndate
               } </li>`;
               rentedHTML += bookHTML;
             }
