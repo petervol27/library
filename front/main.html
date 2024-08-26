@@ -61,6 +61,79 @@
       <h1 class="text-center text-primary">Book List</h1>
       <div class="row row-cols-1 row-cols-md-2 g-4" id="bookList"></div>
     </div>
+    <div
+      class="modal fade"
+      id="editModal"
+      tabindex="-1"
+      aria-labelledby="editModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editModalLabel">Edit Book</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editForm">
+              <div class="mb-3">
+                <label for="bookName" class="form-label">Book Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="bookName"
+                  name="name"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="bookImg" class="form-label">Book Img</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="bookImg"
+                  name="img"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="bookAuthor" class="form-label">Author</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="bookAuthor"
+                  name="author"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="bookQuantity" class="form-label">Quantity</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="bookQuantity"
+                  name="quantity"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="bookIsbn" class="form-label">ISBN</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="bookIsbn"
+                  name="isbn"
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Save changes
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
 
@@ -76,6 +149,7 @@
       rentedIds.push(rent.bookid);
     }
     const isReader = user.id != 1;
+    const isAdmin = user.id == 1;
     const bookList = document.getElementById('bookList');
     let bookListHTML = '';
     for (book of books) {
@@ -103,10 +177,15 @@
           isRented
             ? `<a class="btn btn-success" onclick="returnBook(${book.id})">Return Book</a>`
             : ''
+        }${
+          isAdmin
+            ? `<a class="btn btn-danger" id="deleteBtn-${book.id}">Delete</a> <a class="btn btn-warning" id="editBtn-${book.id}" data-id="${book.id}" data-bs-toggle="modal" data-bs-target="#editModal">Edit</a>`
+            : ''
         }
             </div>
             </div>
-            </div>  `;
+            </div>
+             `;
         bookListHTML += bookHTML;
       } else {
         const bookHTML = `<div class="col">
@@ -133,11 +212,28 @@
           }
           </div>
             </div>
-            </div>  `;
+            </div>
+            `;
         bookListHTML += bookHTML;
       }
     }
     bookList.innerHTML = bookListHTML;
+    books.forEach((book) => {
+      document
+        .getElementById(`deleteBtn-${book.id}`)
+        .addEventListener('click', () => deleteBook(book.id));
+      document
+        .getElementById(`editBtn-${book.id}`)
+        .addEventListener('click', () => {
+          document.getElementById('bookName').value = book.name;
+          document.getElementById('bookImg').value = book.img;
+          document.getElementById('bookAuthor').value = book.author;
+          document.getElementById('bookQuantity').value = book.total_quantity;
+          document.getElementById('bookIsbn').value = book.isbn;
+          // Store the book ID in the form for later use when submitting
+          document.getElementById('editForm').setAttribute('data-id', book.id);
+        });
+    });
   };
   displayBooks();
   const rentBook = async (bookId) => {
@@ -159,5 +255,39 @@
       alert(response.data.message);
       window.location.reload();
     }
+  };
+  const deleteBook = async (bookId) => {
+    const response = await axios.delete(
+      `http://127.0.0.1:9000/books/${bookId}/`
+    );
+    alert(response.data.message);
+    location.reload();
+  };
+  document
+    .getElementById('editForm')
+    .addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const bookId = event.target.getAttribute('data-id');
+      const updatedData = {
+        name: document.getElementById('bookName').value,
+        img: document.getElementById('bookImg').value,
+        author: document.getElementById('bookAuthor').value,
+        quantity: document.getElementById('bookQuantity').value,
+        isbn: document.getElementById('bookIsbn').value,
+      };
+      await updateBook(bookId, updatedData);
+      const editModal = bootstrap.Modal.getInstance(
+        document.getElementById('editModal')
+      );
+      editModal.hide();
+      displayBooks();
+    });
+  const updateBook = async function (bookId, updatedData) {
+    const response = await axios.put(
+      `http://127.0.0.1:9000/books/${Number(bookId)}/`,
+      updatedData
+    );
+    displayBooks();
+    alert(response.data.message);
   };
 </script>

@@ -93,6 +93,20 @@
     .getElementById('addBookBtn')
     .addEventListener('click', () => addBook());
   const addBook = async () => {
-    console.log('entered function');
+    const bookTitle = document.getElementById('title').value;
+    const bookAuthor = document.getElementById('author').value;
+    const bookImg = document.getElementById('img').value;
+    const bookIsbn = document.getElementById('isbn').value;
+    const bookQuantity = document.getElementById('quantity').value;
+    const newBook = {
+      name: bookTitle,
+      author: bookAuthor,
+      img: bookImg,
+      isbn: bookIsbn,
+      quantity: bookQuantity,
+    };
+    const response = await axios.post('http://127.0.0.1:9000/books/', newBook);
+    alert(response.data.message);
+    window.location.href = './main.html';
   };
 </script>

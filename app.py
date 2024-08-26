@@ -12,22 +12,19 @@ CORS(app, supports_credentials=True)
 load_dotenv()
 app.secret_key = os.getenv("secret_key")
 
-DATABASE_URL = os.getenv("db_url")
-
 
 # development: http://127.0.0.1:9000/
 # production: https://library-klmc.onrender.com/
-# def get_connection():
-#     conn = psycopg2.connect(
-#         dbname="pietro-db",
-#         user="pietro",
-#         password="cTEXJEBndJUKDLNchfSLjwqSR4jpCyBV",
-#         host="dpg-cr2dg1lsvqrc73fkkjdg-a.frankfurt-postgres.render.com",
-#         port="5432",
-#     )
-#     return conn
+
+
 def get_connection():
-    conn = psycopg2.connect(DATABASE_URL)
+    conn = psycopg2.connect(
+        host=os.getenv("db_host"),
+        database=os.getenv("db_name"),
+        user=os.getenv("db_user"),
+        password=os.getenv("db_password"),
+        port=os.getenv("db_port"),
+    )
     return conn
 
 
@@ -119,6 +116,58 @@ def get_books():
     rows = cursor.fetchall()
     books = [dict(row) for row in rows]
     return jsonify(books)
+
+
+@app.route("/books/", methods=["POST"])
+def add_book():
+    conn = get_connection()
+    cursor = conn.cursor()
+    data = request.json
+    cursor.execute(
+        "INSERT INTO books(name,author,img,isbn,quantity) VALUES(%s,%s,%s,%s,%s)",
+        (
+            data.get("name"),
+            data.get("author"),
+            data.get("img"),
+            data.get("isbn"),
+            data.get("quantity"),
+        ),
+    )
+    if cursor.rowcount > 0:
+        conn.commit()
+        conn.close()
+        return jsonify({"response": "success", "message": "Book Added Succesfully"})
+    else:
+        return jsonify({"response": "failed", "message": "Error Occured"})
+
+
+@app.route("/books/<int:id>/", methods=["DELETE"])
+def delete_book(id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM books WHERE id = %s", (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"response": "success", "message": "Book Deleted Succesfully"})
+
+
+@app.route("/books/<int:id>/", methods=["PUT"])
+def edit_book(id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    data = request.json
+    print(data)
+    columns = ", ".join([f"{key} =%s" for key in data.keys()])
+    values = list(data.values())
+    values.append(id)
+    query = f"UPDATE books SET {columns} WHERE id = %s"
+    cursor.execute(query, tuple(values))
+    if cursor.rowcount > 0:
+        conn.commit()
+        conn.close()
+        return jsonify({"response": "success", "message": "Book Updated Succesfully"})
+    else:
+        return jsonify({"response": "failed", "message": "Error Occured"})
 
 
 @app.route("/books_rented/", methods=["GET", "POST"])
