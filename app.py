@@ -12,7 +12,11 @@ app = Flask(__name__)
 CORS(
     app,
     supports_credentials=True,
-    resources={r"/*": {"origins": "https://library-klmc.onrender.com/"}},
+    resources={
+        r"/*": {
+            "origins": ["https://library-klmc.onrender.com/", "http://127.0.0.1:9000/"]
+        }
+    },
 )
 load_dotenv()
 app.secret_key = os.getenv("secret_key")
