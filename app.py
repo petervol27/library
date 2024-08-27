@@ -9,7 +9,11 @@ from psycopg2.extras import DictCursor
 
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(
+    app,
+    supports_credentials=True,
+    resources={r"/*": {"origins": "https://library-klmc.onrender.com/"}},
+)
 load_dotenv()
 app.secret_key = os.getenv("secret_key")
 
